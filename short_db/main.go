@@ -26,6 +26,7 @@ type ShortURL struct {
 }
 
 type Stat struct {
+	gorm.Model
 	Shortcode string
 	IP        string
 }
@@ -70,6 +71,33 @@ func ListShort() []ShortURL {
 	}
 
 	return shortResults
+}
+
+func WriteStat(short string, IP string) Stat {
+	db := GetDB()
+
+	statObject := Stat{
+		Shortcode: short,
+		IP:        IP,
+	}
+
+	if result := db.Create(&statObject); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+
+	return statObject
+}
+
+func ListStat() []Stat {
+	db := GetDB()
+
+	statResults := []Stat{}
+
+	if result := db.Find(&statResults); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+
+	return statResults
 }
 
 // Private Helpers

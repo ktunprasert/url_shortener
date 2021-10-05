@@ -6,13 +6,19 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	app.Get("/list", func(c *fiber.Ctx) error {
+	app.Get("/list_short", func(c *fiber.Ctx) error {
 		return c.JSON(short_db.ListShort())
 	})
 
+	app.Get("/list_stat", func(c *fiber.Ctx) error {
+		return c.JSON(short_db.ListStat())
+	})
+
 	app.Get("/:short", func(c *fiber.Ctx) error {
-		url := short_db.ReadShort(c.Params("short"))
+		short := c.Params("short")
+		url := short_db.ReadShort(short)
 		if url != "" {
+			_ = short_db.WriteStat(short, c.IP())
 			return c.Redirect(url, 301)
 		}
 		return c.Status(404).SendString("Not found!")
